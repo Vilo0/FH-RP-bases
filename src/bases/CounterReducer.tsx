@@ -7,9 +7,9 @@ interface CounterState {
 }
 
 const INITIAL_STATE: CounterState = {
-    counter: 10,
-    previous: 10,
-    changes: 10,
+    counter: 0,
+    previous: 0,
+    changes: 0,
 }
 
 type CounterAction = 
@@ -17,7 +17,16 @@ type CounterAction =
     | { type: 'reset' }
 
 const counterReducer = (state: CounterState, action: CounterAction): CounterState => {
+    const { counter, changes } = state;
+
     switch (action.type) {
+        case 'increaseBy':
+            return {
+                // ...state,
+                counter: counter + action.payload.value,
+                changes: changes + 1,
+                previous: counter,
+            };
         case 'reset':
             return {
                 counter: 0,
@@ -31,21 +40,37 @@ const counterReducer = (state: CounterState, action: CounterAction): CounterStat
 
 export const CounterReducerComponent = () => {
 
-    const [{ counter }, dispatch] = useReducer(counterReducer, INITIAL_STATE);
+    const [counterState, dispatch] = useReducer(counterReducer, INITIAL_STATE);
 
-    const handleClick = () => {
+    const handleReset = () => {
         dispatch({ type: 'reset' });
+    }
+
+    const increaseBy = (value: number) => {
+        dispatch({ type: 'increaseBy', payload: { value } });
     }
 
     return(
         <>
-            <h1>Counter Reducer: { counter }</h1>
+            <h1>Counter Reducer: { counterState.counter }</h1>
+            <pre>
+                { JSON.stringify(counterState, null, 2) }
+            </pre>
 
-            <button 
-                className="btn btn-primary"
-                onClick={ handleClick }
-            >
+            <button onClick={ () => increaseBy(1) }>
                 +1
+            </button>
+
+            <button onClick={ () => increaseBy(5) }>
+                +5
+            </button>
+
+            <button onClick={ () => increaseBy(10) }>
+                +10
+            </button>
+
+            <button onClick={ handleReset }>
+                reset
             </button>
         </>
     );
